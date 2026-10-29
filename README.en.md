@@ -43,7 +43,7 @@ RoboDock fixes the three first — features come second.
 2. Run `RoboDock.exe`
 3. Pick a source folder, a destination folder, a strategy → **Preview** → **Start copy**
 
-<!-- TODO(M1): screenshot -->
+![Main window](docs/screenshots/01-simple-mode.png)
 
 ## The four strategies
 
@@ -55,6 +55,10 @@ Only the second one deletes anything.
 | 🔁 Keep identical | `/MIR` | ✅ **Yes** | Destination must match source exactly |
 | ⬆️ Update changed only | `/E /XO` | ❌ No | Overwrite older files, keep extras |
 | ➕ Fill missing only | `/E /XC /XN /XO` | ❌ No | Never overwrite anything existing |
+
+Clicking **Preview first** gives you a summary card — **deletions are listed separately in red**:
+
+![Preview card](docs/screenshots/02-preview-card.png)
 
 ## Why it's faster than File Explorer
 
@@ -72,6 +76,10 @@ Only the second one deletes anything.
 - **Mirror a project to a NAS** — use "Keep identical"; extras on the NAS get deleted (the app shows the count first)
 - **Move huge files to an external drive** — enable restartable + unbuffered I/O, `/MT:8`
 - **Bulk-copy many small files** — set `/MT:32`; use `/R:0` so failures don't stall
+
+### Need finer control? Expand "Advanced options"
+
+![Advanced options](docs/screenshots/03-advanced.png)
 
 ## ⚠️ About destructive operations
 

@@ -1,0 +1,34 @@
+## .NET / C#
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dbmdl
+project.lock.json
+.vs/
+
+## Build outputs
+publish/
+*.pdb
+*.nupkg
+
+## Test results
+TestResults/
+[Cc]overage*/
+
+## IDE
+.idea/
+.vscode/
+*.swp
+
+## OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+## Local scratch
+_test/
+*.log
+!docs/*.log

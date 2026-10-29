@@ -1,0 +1,177 @@
+<Window x:Class="RoboDock.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RoboDock" Height="820" Width="940" MinHeight="620" MinWidth="820"
+        FontSize="13" WindowStartupLocation="CenterScreen">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock x:Name="TxtTitle" Text="RoboDock" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock x:Name="LblLanguage" Text="语言" VerticalAlignment="Center" Margin="0,0,6,0" Opacity="0.7" />
+                <ComboBox x:Name="CmbLanguage" Width="110" SelectionChanged="OnLanguageChanged">
+                    <ComboBoxItem Content="简体中文" />
+                    <ComboBoxItem Content="English" />
+                </ComboBox>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- 源 -->
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="130" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="LblSource" Grid.Column="0" Text="从哪复制（源）" VerticalAlignment="Center" />
+            <TextBox x:Name="TxtSource" Grid.Column="1" Padding="6,4" TextChanged="OnTextChanged" />
+            <Button x:Name="BtnBrowseSource" Grid.Column="2" Content="选择…" Padding="12,4" Margin="8,0,0,0" Click="OnBrowseSource" />
+        </Grid>
+
+        <!-- 目标 -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="130" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="LblDestination" Grid.Column="0" Text="复制到哪（目标）" VerticalAlignment="Center" />
+            <TextBox x:Name="TxtDestination" Grid.Column="1" Padding="6,4" TextChanged="OnTextChanged" />
+            <Button x:Name="BtnBrowseDestination" Grid.Column="2" Content="选择…" Padding="12,4" Margin="8,0,0,0" Click="OnBrowseDestination" />
+        </Grid>
+
+        <!-- 模板 + 策略 -->
+        <StackPanel Grid.Row="3" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock x:Name="LblTemplates" Text="常用场景" VerticalAlignment="Center" Width="130" />
+                <ComboBox x:Name="CmbTemplate" Width="380" SelectionChanged="OnTemplateChanged">
+                    <ComboBoxItem Content="（不套用模板）" />
+                    <ComboBoxItem Content="备份照片/视频到 U 盘（只增不改）" />
+                    <ComboBoxItem Content="把项目同步到 NAS（保持一模一样）" />
+                    <ComboBoxItem Content="迁移大文件到移动硬盘（多线程+续传）" />
+                    <ComboBoxItem Content="大量小文件快速搬运（/MT:32）" />
+                </ComboBox>
+            </StackPanel>
+
+            <TextBlock x:Name="LblWhatToDo" Text="你想做什么？" Margin="0,0,0,6" FontWeight="SemiBold" />
+            <UniformGrid Columns="4" Rows="1">
+                <RadioButton x:Name="RbBackup" GroupName="Strategy" Margin="0,0,8,0" Padding="10" BorderThickness="1"
+                             BorderBrush="#DDDDDD" Checked="OnStrategyChanged" VerticalContentAlignment="Top"
+                             Content="📄 备份过去&#10;只增不改，不删目标" />
+                <RadioButton x:Name="RbMirror" GroupName="Strategy" Margin="0,0,8,0" Padding="10" BorderThickness="1"
+                             BorderBrush="#DDDDDD" Checked="OnStrategyChanged" VerticalContentAlignment="Top"
+                             Content="🔁 保持一模一样 ⚠&#10;会删除目标多余文件" />
+                <RadioButton x:Name="RbUpdate" GroupName="Strategy" Margin="0,0,8,0" Padding="10" BorderThickness="1"
+                             BorderBrush="#DDDDDD" Checked="OnStrategyChanged" VerticalContentAlignment="Top"
+                             Content="⬆️ 只更新改动过的&#10;覆盖旧的，不删多余" />
+                <RadioButton x:Name="RbFill" GroupName="Strategy" Padding="10" BorderThickness="1"
+                             BorderBrush="#DDDDDD" Checked="OnStrategyChanged" VerticalContentAlignment="Top"
+                             Content="➕ 只补缺失的&#10;已有的跳过" />
+            </UniformGrid>
+
+            <TextBlock x:Name="TxtDanger" Foreground="#C62828" FontWeight="SemiBold" Margin="0,8,0,0"
+                       Visibility="Collapsed" Text="⚠ 这个策略会删除目标端多余的文件，且不进回收站。" />
+        </StackPanel>
+
+        <!-- 高级选项 -->
+        <Expander x:Name="ExpAdvanced" Grid.Row="4" Header="高级选项" Margin="0,4,0,10" IsExpanded="False">
+            <Grid Margin="8,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock x:Name="LblMultiThread" Grid.Row="0" Grid.Column="0" Text="多线程（/MT）" VerticalAlignment="Center" Margin="0,0,6,6" />
+                <ComboBox x:Name="CmbMultiThread" Grid.Row="0" Grid.Column="1" Margin="0,0,16,6" SelectionChanged="OnComboChanged">
+                    <ComboBoxItem x:Name="ItemMtOff" Content="关闭" />
+                    <ComboBoxItem Content="8" />
+                    <ComboBoxItem Content="16" IsSelected="True" />
+                    <ComboBoxItem Content="32" />
+                </ComboBox>
+
+                <TextBlock x:Name="LblRetry" Grid.Row="0" Grid.Column="2" Text="失败重试（/R）" VerticalAlignment="Center" Margin="0,0,6,6" />
+                <ComboBox x:Name="CmbRetry" Grid.Row="0" Grid.Column="3" Margin="0,0,16,6" SelectionChanged="OnComboChanged">
+                    <ComboBoxItem Content="0" />
+                    <ComboBoxItem Content="2" IsSelected="True" />
+                    <ComboBoxItem Content="5" />
+                </ComboBox>
+
+                <CheckBox x:Name="ChkRestartable" Grid.Row="1" Grid.Column="0" Content="可断点续传（/Z）"
+                          VerticalAlignment="Center" Margin="0,0,0,6" Checked="OnCheckChanged" Unchecked="OnCheckChanged" />
+                <CheckBox x:Name="ChkUnbuffered" Grid.Row="1" Grid.Column="1" Content="大文件模式（/J）" VerticalAlignment="Center"
+                          Margin="0,0,0,6" Checked="OnCheckChanged" Unchecked="OnCheckChanged" Grid.ColumnSpan="2" />
+                <CheckBox x:Name="ChkBackupMode" Grid.Row="1" Grid.Column="3" Content="备份模式（/B）" VerticalAlignment="Center"
+                          Margin="0,0,0,6" Checked="OnCheckChanged" Unchecked="OnCheckChanged" Grid.ColumnSpan="2" />
+
+                <TextBlock x:Name="LblExclude" Grid.Row="2" Grid.Column="0" Text="排除" VerticalAlignment="Center" Margin="0,0,6,6" />
+                <TextBox x:Name="TxtExclude" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,16,6" Padding="4,2"
+                         TextChanged="OnTextChanged" ToolTip="分号分隔，例如 *.tmp;~$*" />
+
+                <TextBlock x:Name="LblLogFile" Grid.Row="3" Grid.Column="0" Text="日志文件" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="TxtLogFile" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4" Margin="0,0,16,0" Padding="4,2"
+                         TextChanged="OnTextChanged" />
+            </Grid>
+        </Expander>
+
+        <!-- 命令预览 -->
+        <DockPanel Grid.Row="5" Margin="0,0,0,10">
+            <TextBlock x:Name="LblCommand" DockPanel.Dock="Top" Text="将要执行的命令" Margin="0,0,0,4" FontWeight="SemiBold" />
+            <Button x:Name="BtnCopyCommand" DockPanel.Dock="Right" Content="复制" Padding="12,4" Margin="8,0,0,0" Click="OnCopyCommand" />
+            <TextBox x:Name="TxtCommand" IsReadOnly="True" FontFamily="Consolas" Padding="6,4"
+                     Background="#F7F7F7" TextWrapping="Wrap" MinHeight="42" VerticalScrollBarVisibility="Auto" />
+        </DockPanel>
+
+        <!-- 结论卡 -->
+        <Border x:Name="CardConclusion" Grid.Row="6" Visibility="Collapsed" Margin="0,0,0,10"
+                BorderThickness="1" BorderBrush="#CFD8DC" Background="#FAFAFA" Padding="12" CornerRadius="4">
+            <StackPanel>
+                <TextBlock x:Name="TxtConclusionTitle" FontWeight="SemiBold" Margin="0,0,0,8" Text="将要发生什么" />
+                <TextBlock x:Name="TxtConclusionBody" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <!-- 进度 -->
+        <StackPanel Grid.Row="7" Margin="0,0,0,8">
+            <ProgressBar x:Name="BarProgress" Height="10" Minimum="0" Maximum="100" />
+            <DockPanel Margin="0,4,0,0">
+                <TextBlock x:Name="TxtProgress" DockPanel.Dock="Left" Text="" />
+                <TextBlock x:Name="TxtStats" HorizontalAlignment="Right" Opacity="0.75" Text="" />
+            </DockPanel>
+        </StackPanel>
+
+        <!-- 日志 -->
+        <TextBox x:Name="TxtLog" Grid.Row="8" IsReadOnly="True" FontFamily="Consolas" FontSize="12"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                 Background="#1E1E1E" Foreground="#D4D4D4" Padding="8" TextWrapping="NoWrap" />
+
+        <!-- 按钮 -->
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="BtnPreview" Content="先看看会发生什么" Padding="18,8" Margin="0,0,8,0" Click="OnPreview" />
+            <Button x:Name="BtnStart" Content="开始复制" Padding="18,8" Margin="0,0,8,0" IsEnabled="False"
+                    Background="#E8F5E9" Click="OnStart" />
+            <Button x:Name="BtnCancel" Content="取消" Padding="18,8" IsEnabled="False" Click="OnCancel" />
+        </StackPanel>
+    </Grid>
+</Window>

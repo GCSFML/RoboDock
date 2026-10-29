@@ -1,0 +1,42 @@
+﻿name: build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore RoboDock.sln
+
+      - name: Build
+        run: dotnet build RoboDock.sln -c Release --no-restore
+
+      # 娴嬭瘯椤圭洰闆?NuGet 渚濊禆锛岀洿鎺?dotnet run 鍗冲彲
+      - name: Test
+        run: dotnet run --project tests/RoboDock.Core.Tests -c Release --no-build
+
+      - name: Publish single-file app
+        run: >
+          dotnet publish src/RoboDock.App -c Release -r win-x64
+          --self-contained true -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RoboDock-win-x64
+          path: publish/RoboDock.App.exe
+          if-no-files-found: error

@@ -2,6 +2,11 @@
 
 **A GUI for robocopy. No flags to memorize, and you always know before it deletes anything.**
 
+[![build](https://github.com/GCSFML/RoboDock/actions/workflows/build.yml/badge.svg)](https://github.com/GCSFML/RoboDock/actions/workflows/build.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-lightgrey.svg)](#requirements)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4.svg)](https://dotnet.microsoft.com/download)
+
 English | [简体中文](README.md)
 
 > 🚧 Work in progress (M1). UI and wording may change. Feature requests are welcome in Issues.

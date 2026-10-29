@@ -2,6 +2,11 @@
 
 **robocopy 的图形界面。不用记参数，删文件前一定先告诉你。**
 
+[![build](https://github.com/GCSFML/RoboDock/actions/workflows/build.yml/badge.svg)](https://github.com/GCSFML/RoboDock/actions/workflows/build.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-lightgrey.svg)](#环境要求)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4.svg)](https://dotnet.microsoft.com/download)
+
 [English](README.en.md) | 简体中文
 
 > 🚧 当前处于 M1 开发阶段，界面与文案可能调整。欢迎在 Issues 里提需求。

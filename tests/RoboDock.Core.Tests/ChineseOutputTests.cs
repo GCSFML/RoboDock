@@ -125,4 +125,38 @@ public class ChineseOutputTests
 
         Assert.Equal(65001, encoding.CodePage);
     }
+
+    /// <summary>
+    /// 回归测试：CI（en-US Windows，OEM 代码页 437）上曾把 GBK 解成乱码。
+    /// 编码探测必须看内容，不能看系统区域设置。
+    /// </summary>
+    [Fact]
+    public void GbkIsDetectedEvenOnEnglishSystem()
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+            var gbk = System.Text.Encoding.GetEncoding(936).GetBytes(@"F:\demo\多余A.txt");
+            var encoding = OutputDecoder.Detect(gbk);
+
+            Assert.Equal(936, encoding.CodePage);
+            Assert.Equal(@"F:\demo\多余A.txt", encoding.GetString(gbk));
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = original;
+        }
+    }
+
+    [Fact]
+    public void PureAsciiIsTreatedAsUtf8()
+    {
+        var ascii = System.Text.Encoding.ASCII.GetBytes("-------------------------------------------------------------------------------");
+
+        var encoding = OutputDecoder.Detect(ascii);
+
+        Assert.Equal(65001, encoding.CodePage);
+    }
 }

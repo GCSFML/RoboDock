@@ -84,6 +84,33 @@ public class ChineseOutputTests
     }
 
     [Fact]
+    public void SizeWithUnitIsParsed()
+    {
+        // 大文件在日志里显示成 "2.0 m"，必须换算成字节
+        var entry = PreviewParser.ParseLine("\t    新文件    \t\t   2.0 m\tF:\\demo\\大文件.bin");
+
+        Assert.NotNull(entry);
+        Assert.Equal(PreviewKind.CopyFile, entry.Kind);
+        Assert.Equal(2L * 1024 * 1024, entry.SizeBytes);
+    }
+
+    [Fact]
+    public void ExtraDirectoryCountsAsDeletionAndNegativeSizeIsNormalised()
+    {
+        // 目录行的"大小"列是 -1，必须归一成 0，否则字节合计会被污染
+        var preview = PreviewParser.Parse(
+        [
+            "\t  *多余目录         -1\tF:\\demo\\dst\\RoboDock.App\\",
+            "\t  *额外 文件 \t\t       7\textra1.txt",
+        ]);
+
+        Assert.Equal(1, preview.DirectoryCountToDelete);
+        Assert.Equal(1, preview.FileCountToDelete);
+        Assert.Equal(2, preview.TotalDeletions);
+        Assert.Equal(7L, preview.BytesToDelete);
+    }
+
+    [Fact]
     public void EnglishAndChineseProduceIdenticalCounts()
     {
         var english = PreviewParser.Parse(

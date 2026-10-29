@@ -22,7 +22,7 @@ namespace RoboDock.Core;
 /// </summary>
 public static class PreviewParser
 {
-    private static readonly Regex TrailingSizeRegex = new(@"(\d+)\s*$", RegexOptions.CultureInvariant);
+    private static readonly Regex TrailingSizeRegex = new(@"(-?\d+(?:\.\d+)?)\s*([kmgtKMGT]?)\s*$", RegexOptions.CultureInvariant);
 
     public static PreviewResult Parse(IEnumerable<string> lines)
     {
@@ -55,8 +55,25 @@ public static class PreviewParser
         var sizeMatch = TrailingSizeRegex.Match(prefix);
         if (sizeMatch.Success)
         {
-            _ = long.TryParse(sizeMatch.Groups[1].Value, NumberStyles.Integer,
-                CultureInfo.InvariantCulture, out size);
+            // 大小列可能是 "10"，也可能是带单位的 "2.0 m"
+            if (double.TryParse(sizeMatch.Groups[1].Value, NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out var number))
+            {
+                var unit = sizeMatch.Groups[2].Value.ToLowerInvariant();
+                var multiplier = unit switch
+                {
+                    "k" => 1024L,
+                    "m" => 1024L * 1024,
+                    "g" => 1024L * 1024 * 1024,
+                    "t" => 1024L * 1024 * 1024 * 1024,
+                    _ => 1L,
+                };
+                size = (long)(number * multiplier);
+            }
+
+            // 目录行的"大小"列是 -1（robocopy 对目录不统计字节），归一成 0 避免污染合计
+            if (size < 0) size = 0;
+
             label = prefix[..sizeMatch.Index];
         }
         else

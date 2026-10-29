@@ -106,6 +106,8 @@ public static class UiText
 
         (true, "ExitCode") => "退出码",
         (false, "ExitCode") => "Exit code",
+        (true, "LogHint") => "运行时会在这里显示 robocopy 的原始输出",
+        (false, "LogHint") => "robocopy's raw output will appear here when you run it",
 
         (true, "WillHappen") => "将要发生什么",
         (false, "WillHappen") => "What will happen",
@@ -119,6 +121,8 @@ public static class UiText
         (false, "CardFiles") => "files",
         (true, "CardDirs") => "个目录",
         (false, "CardDirs") => "dirs",
+        (true, "CardFilesOrDirs") => " 个文件/目录",
+        (false, "CardFilesOrDirs") => " files/dirs",
         (true, "Duration") => "用时 ",
         (false, "Duration") => "Duration ",
         (true, "Cancelled") => "已取消",

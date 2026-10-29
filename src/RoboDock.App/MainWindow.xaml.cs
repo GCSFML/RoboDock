@@ -107,6 +107,8 @@ public partial class MainWindow : Window
         BtnPreview.Content = t("Preview");
         BtnStart.Content = t("Start");
         BtnCancel.Content = t("Cancel");
+        TxtLogHint.Text = t("LogHint");
+        UpdateLogHint();
         LblLanguage.Text = UiText.Language == Lang.Zh ? "语言" : "Language";
 
         RbBackup.Content = t("StrategyBackup");
@@ -176,9 +178,11 @@ public partial class MainWindow : Window
 
     private string BuildPreviewBody(PreviewResult preview)
     {
-        var copy = FormatCount(preview.FileCountToCopy, preview.BytesToCopy);
-        var create = FormatCount(preview.DirectoryCountToCreate, 0, isDirectory: true);
-        var delete = FormatCount(preview.FileCountToDelete, preview.BytesToDelete);
+        var copy = FormatCount(preview.FileCountToCopy, preview.BytesToCopy, "CardFiles");
+        var create = FormatCount(preview.DirectoryCountToCreate, 0, "CardDirs");
+
+        // 删除要把文件 + 目录一起算，否则镜像删目录时卡片会显示"删除 0 个"
+        var delete = FormatCount(preview.TotalDeletions, preview.BytesToDelete, "CardFilesOrDirs");
 
         return string.Join(Environment.NewLine,
             $"  {UiText.T("CardCopy")}    {copy}",
@@ -186,10 +190,10 @@ public partial class MainWindow : Window
             $"  {UiText.T("CardDelete")}    {delete}");
     }
 
-    private string FormatCount(int count, long bytes, bool isDirectory = false)
+    private string FormatCount(int count, long bytes, string unitKey)
     {
-        var unit = " " + UiText.T(isDirectory ? "CardDirs" : "CardFiles");
-        var size = isDirectory ? "" : "  " + FormatBytes(bytes);
+        var unit = " " + UiText.T(unitKey);
+        var size = bytes > 0 ? "  " + FormatBytes(bytes) : "";
         return $"{count:N0}{unit}{size}";
     }
 
@@ -399,6 +403,7 @@ public partial class MainWindow : Window
         BarProgress.Value = 0;
         BtnCancel.IsEnabled = true;
         TxtLog.Clear();
+        UpdateLogHint();
         SetStatus("Running");
         _cts = new CancellationTokenSource();
 
@@ -480,7 +485,12 @@ public partial class MainWindow : Window
         if (TxtLog.Text.Length > 400_000) TxtLog.Clear();
         TxtLog.AppendText(line + Environment.NewLine);
         TxtLog.ScrollToEnd();
+        UpdateLogHint();
     }
+
+    /// <summary>日志为空时显示提示文字，避免一大片纯黑。</summary>
+    private void UpdateLogHint()
+        => TxtLogHint.Visibility = TxtLog.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
 
     private static string ShortPath(string path)
     {
